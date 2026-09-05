@@ -46,7 +46,9 @@ db.exec(`
 const MIGRATION_COLUMNS = [
   ['token', 'TEXT'],
   ['token_created_at', 'INTEGER'],
-  ['state', 'TEXT']
+  ['state', 'TEXT'],
+  ['banned', 'INTEGER DEFAULT 0'],
+  ['role', 'INTEGER DEFAULT 0']
 ];
 
 (function migrateAccounts() {
