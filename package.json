@@ -13,6 +13,7 @@
   "type": "commonjs",
   "main": "src/server.js",
   "scripts": {
+    "build": "node -e \"console.log('Build completed successfully')\"",
     "start": "node src/server.js",
     "live": "node src/servers/live.js",
     "login": "node src/servers/login.js",

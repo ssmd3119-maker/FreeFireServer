@@ -5,7 +5,7 @@ const _list = (v) => String(v || '').split(',').map((s) => s.trim()).filter(Bool
 module.exports = {
   port: 3000,
   ports: {
-    live: Number(process.env.LIVE_PORT || process.env.PORT || 3000),
+    live: Number(process.env.APP_PORT || process.env.DEFAULT_APP_PORT || 3000),
     login: Number(process.env.LOGIN_PORT || 3001),
     main: Number(process.env.MAIN_PORT || 3002),
     // TCP gateway (notification channel). Handed to the client as
@@ -63,9 +63,9 @@ module.exports = {
   },
   // --- infra migration (Phase 0+) -------------------------------------------
   // Redis event bus (Streams + PubSub); consumed by the bus client in src/bus.
-  redis: { url: process.env.REDIS_URL || 'redis://127.0.0.1:6379' },
+  redis: { url: process.env.REDIS_URL || '' },
   // PostgreSQL (Phase 1+). Empty keeps the SQLite path (db.file) in use.
-  postgres: { url: process.env.DATABASE_URL || process.env.DB_URL || '' },
+  postgres: { url: (process.env.USE_POSTGRES === 'true' && (process.env.DATABASE_URL || process.env.DB_URL)) || '' },
   // --- auth / login hardening ----------------------------------------------
   // Gates the game login/register against the auth server's store + the client's
   // signature/version. Every gate is OFF or safe by default so the live (incl.

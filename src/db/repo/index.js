@@ -20,11 +20,16 @@ let repo = null;
 
 function getRepo() {
   if (repo) return repo;
-  const url = config.postgres && config.postgres.url;
+  const url = (process.env.USE_POSTGRES === 'true') && config.postgres && config.postgres.url;
   if (url) {
-    const { PostgresRepo } = require('./postgres');
-    repo = new PostgresRepo(url);
-    logger.info('[repo] backend: PostgreSQL');
+    try {
+      const { PostgresRepo } = require('./postgres');
+      repo = new PostgresRepo(url);
+      logger.info('[repo] backend: PostgreSQL');
+    } catch (err) {
+      logger.warn(`[repo] postgres failed (${err.message}), falling back to SQLite`);
+      repo = require('./sqlite');
+    }
   } else {
     repo = require('./sqlite');
     logger.info('[repo] backend: SQLite');

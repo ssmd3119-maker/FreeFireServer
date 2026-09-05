@@ -1,0 +1,6 @@
+{
+  "name": "Free Fire Server",
+  "description": "Game emulator and API server for Free Fire with account management, protocol handlers, and live admin dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

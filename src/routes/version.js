@@ -12,15 +12,21 @@ const loginDomain = (config.domains && config.domains.login) || '';
 const version = process.env.GAME_VERSION || config.version || '1.70.0';
 const { getLocalIp } = require('../utils/address');
 
-function loginServerUrl(localIp) {
-    if (!loginDomain) return 'http://' + localIp + ':' + loginPort + '/';
-    const base = loginDomain.includes('://') ? loginDomain : 'https://' + loginDomain;
-    return base.endsWith('/') ? base : base + '/';
+function loginServerUrl(localIp, req) {
+    if (loginDomain && !loginDomain.includes('example.com')) {
+        const base = loginDomain.includes('://') ? loginDomain : 'https://' + loginDomain;
+        return base.endsWith('/') ? base : base + '/';
+    }
+    if (req && req.headers && req.headers.host) {
+        const proto = req.headers['x-forwarded-proto'] || 'http';
+        return `${proto}://${req.headers.host}/`;
+    }
+    return 'http://' + localIp + ':' + loginPort + '/';
 }
 
 router.get('/ver.php', async (req, res) => {
     const requestIp = req.headers['x-forwarded-for'] || req.ip;
-    const localIp = loginDomain ? '' : await getLocalIp();
+    const localIp = (loginDomain && !loginDomain.includes('example.com')) ? '' : await getLocalIp();
     data = {
         "appstore_url": "https://play.google.com/store/apps/details?id=com.dts.freefireth",
         "billboard_msg": "",
@@ -37,7 +43,7 @@ router.get('/ver.php', async (req, res) => {
         "maintenance_region": "",
         "remote_option_version": "optionallocres:26|optionalclothres:282|optionalfullscreencgres:19|optionalludores:19|optionalmap1res:194|optionalmap2res:36|optionalmap4res:19|optionalmapres:17|optionalpetres:17|optionalrushb:38|optionalrushingpetsres:61|optionalvoiceres:147|optionalwerewolves:48",
         "remote_version": version,
-        "server_url": loginServerUrl(localIp)
+        "server_url": loginServerUrl(localIp, req)
     }
     res.json(data);
 });

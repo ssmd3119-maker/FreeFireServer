@@ -11,8 +11,8 @@ function startServer(app, port, name) {
   server.keepAliveTimeout = 65000;
   server.headersTimeout = 66000;
 
-  server.listen(port, () => {
-    logger.info(`[${name}] listening on port ${port}`);
+  server.listen(port, '0.0.0.0', () => {
+    logger.info(`[${name}] listening on 0.0.0.0:${port}`);
   });
 
   function shutdown(signal) {

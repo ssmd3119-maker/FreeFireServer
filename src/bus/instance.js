@@ -6,6 +6,7 @@
 // working. Callers must treat the result as best-effort (null-check + catch).
 const config = require('../../config/default');
 const { Bus } = require('./index');
+const { InMemoryBus } = require('./inMemoryBus');
 const logger = require('../logger');
 
 let created = false;
@@ -15,13 +16,16 @@ function getBus() {
   if (created) return bus;
   created = true;
   const url = config.redis && config.redis.url;
-  if (!url) return (bus = null);
+  if (!url) {
+    logger.info('[bus] no REDIS_URL — using in-memory bus');
+    return (bus = new InMemoryBus({ source: process.env.BUS_SOURCE || config.nodeId || 'node', node: config.nodeId }));
+  }
   try {
     bus = new Bus({ url, source: process.env.BUS_SOURCE || config.nodeId || 'node', node: config.nodeId });
     logger.info('[bus] shared instance connected');
   } catch (err) {
-    logger.error(`[bus] shared instance init failed: ${err.message}`);
-    bus = null;
+    logger.warn(`[bus] shared instance init failed: ${err.message} — using in-memory bus`);
+    bus = new InMemoryBus({ source: process.env.BUS_SOURCE || config.nodeId || 'node', node: config.nodeId });
   }
   return bus;
 }

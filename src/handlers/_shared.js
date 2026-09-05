@@ -51,13 +51,16 @@ function randInt(n) {
 
 function serverUrl(ctx) {
   // Explicit override wins (e.g. behind a proxy / fixed public URL).
-  if (config.protocol && config.protocol.serverUrl) return config.protocol.serverUrl;
-  // Otherwise derive from the host the client connected on, but swap the port to
-  // the MAIN server's port. This redirects the client off the login server
-  // (3001) onto the main server (3002) after MajorLogin, and is also correct for
-  // GetLoginData (which runs on main and points its log URLs at main).
-  const rawHost = (ctx.req.headers.host || '').trim();
+  if (config.protocol && config.protocol.serverUrl && !config.protocol.serverUrl.includes('example.com')) {
+    return config.protocol.serverUrl;
+  }
+  const req = ctx && ctx.req;
+  const rawHost = (req && req.headers && req.headers.host || '').trim();
   if (!rawHost) return '';
+  const proto = (req && req.headers && req.headers['x-forwarded-proto']) || 'http';
+  if (process.env.UNIFIED_SERVER !== 'false') {
+    return `${proto}://${rawHost}`;
+  }
   const hostNoPort = rawHost.replace(/:\d+$/, '');
   const mainPort = (config.ports && config.ports.main) || 3002;
   return `http://${hostNoPort}:${mainPort}`;
