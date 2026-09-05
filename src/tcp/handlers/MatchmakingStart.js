@@ -16,7 +16,9 @@ const matchmaker = require('../matchmaker');
 function handler(reqObj, ctx) {
   const mode = {
     map_id: (Array.isArray(reqObj.map_ids) && reqObj.map_ids[0]) || 1,
-    game_mode: reqObj.game_mode || 15,
+    game_mode: (reqObj.game_mode !== undefined && reqObj.game_mode !== null && reqObj.game_mode !== 0)
+      ? reqObj.game_mode
+      : 1, // default to 1 (Bermuda Classic / Battle Royale)
     match_mode: reqObj.match_mode || 1,
     difficulty: reqObj.difficulty || 0
   };

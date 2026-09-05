@@ -225,4 +225,38 @@ router.get('/endpoints', (req, res) => {
   }
 });
 
+// 12. Active Game Modes (Bermuda Classic & Clash Squad)
+router.get('/game-modes', (req, res) => {
+  res.json({
+    modes: [
+      {
+        id: 1,
+        key: 'bermuda_classic',
+        name: 'Bermuda Classic',
+        type: 'Battle Royale',
+        map_id: 1,
+        map_name: 'Bermuda (Paradise)',
+        config_id: 1001,
+        max_players: 48,
+        group_modes: ['Solo', 'Duo', 'Squad'],
+        status: 'open',
+        visual_map: 'https://foices.github.io/minhas_resources/bermuda.png'
+      },
+      {
+        id: 15,
+        key: 'clash_squad',
+        name: 'Clash Squad (CS)',
+        type: 'Round-based 4v4',
+        map_id: 1,
+        map_name: 'Bermuda (Paradise)',
+        config_id: 1015,
+        max_players: 8,
+        group_modes: ['Squad (4v4)'],
+        status: 'open',
+        visual_map: 'https://foices.github.io/minhas_resources/contra_squad.png'
+      }
+    ]
+  });
+});
+
 module.exports = router;

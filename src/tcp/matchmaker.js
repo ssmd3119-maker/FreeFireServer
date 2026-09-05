@@ -216,7 +216,7 @@ async function formMatch(entries) {
       sleep_ms: 1,
       map_id: mode.map_id,
       game_mode: mode.game_mode,
-      match_mode: 6 /*mode.match_mode*/, // forced 6 so client renders waiting for players dialogue
+      match_mode: (mode.game_mode === 15) ? 6 : (mode.match_mode || 1),
       difficulty: mode.difficulty || 0,
       use_cache: false,
       first_login: false

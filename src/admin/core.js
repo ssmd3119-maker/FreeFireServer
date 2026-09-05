@@ -20,7 +20,7 @@ const config = require('../../config/default');
 const logger = require('../logger');
 const { getRepo } = require('../db/repo');
 const authStore = require('../db/authStore');
-const { Bus } = require('../bus');
+const { getBus } = require('../bus/instance');
 
 function safeSchema() {
   const s = (config.auth && config.auth.pgSchema) || 'auth';
@@ -32,9 +32,7 @@ class AdminCore {
     this.actor = actor || process.env.ADMIN_ACTOR || (os.userInfo && os.userInfo().username) || 'cli';
     this.schema = safeSchema();
     this.repo = getRepo();
-    this.bus = (config.redis && config.redis.url)
-      ? new Bus({ url: config.redis.url, source: 'admin', node: 'admin' })
-      : null;
+    this.bus = getBus();
     // Own pool for the auth ban flag + the audit log. Lazy require so a SQLite-only
     // dev box (no DATABASE_URL) doesn't need pg for the read-only commands.
     this.pool = null;

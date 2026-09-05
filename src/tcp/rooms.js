@@ -102,11 +102,29 @@ function playerInfo(m, mapId) {
 // group.members.Count with NO client-side padding; a RoomPlayerInfo{account_id:0} draws an EMPTY
 // seat (SetUIData). So we emit ALL teams and PAD each members[] to the per-team capacity with
 // account_id:0 placeholders, else only the host's seat shows and the empty slots are missing.
+function getNumTeams(room) {
+  if (room.game_mode === 15) return NUM_TEAMS; // Clash Squad: 2 teams (4v4)
+  const maxMembers = room.max_member_num || 48;
+  if (room.group_mode === 0) return Math.min(maxMembers, 48); // Solo: 1 player per team
+  if (room.group_mode === 1) return Math.min(Math.ceil(maxMembers / 2), 24); // Duo: 2 players per team
+  if (room.group_mode === 3) return Math.min(Math.ceil(maxMembers / 4), 12); // Squad: 4 players per team
+  return NUM_TEAMS;
+}
+
+function perTeamCap(room) {
+  if (room.game_mode === 15) return Math.max(1, Math.ceil((room.max_member_num || DEFAULT_MAX_MEMBERS) / NUM_TEAMS));
+  if (room.group_mode === 0) return 1; // Solo
+  if (room.group_mode === 1) return 2; // Duo
+  if (room.group_mode === 3) return 4; // Squad
+  const numTeams = getNumTeams(room);
+  return Math.max(1, Math.ceil((room.max_member_num || 48) / numTeams));
+}
+
 function toRoomInfo(room) {
-  const maxMembers = room.max_member_num || DEFAULT_MAX_MEMBERS;
-  const perTeam = Math.max(1, Math.ceil(maxMembers / NUM_TEAMS));
+  const numTeams = getNumTeams(room);
+  const perTeam = perTeamCap(room);
   const groups = [];
-  for (let gid = 1; gid <= NUM_TEAMS; gid += 1) {
+  for (let gid = 1; gid <= numTeams; gid += 1) {
     const seats = Array.from({ length: perTeam }, () => ({ account_id: 0, group_id: gid })); // empty seats
     for (const m of room.members) {
       if ((m.group_id || 1) !== gid) continue;
@@ -149,17 +167,16 @@ function toBasicInfo(room) {
   };
 }
 
-// Assign a joiner to the emptier team (ties -> team 1) so CS rooms stay balanced without
+// Assign a joiner to the emptier team (ties -> team 1) so CS and BR rooms stay balanced without
 // requiring the seat-switch op.
 function pickTeam(room) {
-  const counts = new Array(NUM_TEAMS).fill(0);
-  for (const m of room.members) { const i = (m.group_id || 1) - 1; if (i >= 0 && i < NUM_TEAMS) counts[i] += 1; }
+  const numTeams = getNumTeams(room);
+  const counts = new Array(numTeams).fill(0);
+  for (const m of room.members) { const i = (m.group_id || 1) - 1; if (i >= 0 && i < numTeams) counts[i] += 1; }
   let best = 0;
-  for (let i = 1; i < NUM_TEAMS; i += 1) if (counts[i] < counts[best]) best = i;
+  for (let i = 1; i < numTeams; i += 1) if (counts[i] < counts[best]) best = i;
   return best + 1;
 }
-
-function perTeamCap(room) { return Math.max(1, Math.ceil((room.max_member_num || DEFAULT_MAX_MEMBERS) / NUM_TEAMS)); }
 
 // Lowest free seat index (0-based) in a team, or -1 if the team is full.
 function freeSeat(room, groupId) {

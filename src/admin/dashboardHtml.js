@@ -95,6 +95,9 @@ function renderDashboard() {
       <button onclick="switchTab('tab-overview')" id="tab-btn-overview" class="tab-btn border-b-2 border-amber-500 text-amber-400 pb-3 px-3 transition whitespace-nowrap">
         Diagnostics & Handshake
       </button>
+      <button onclick="switchTab('tab-modes')" id="tab-btn-modes" class="tab-btn border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 px-3 transition whitespace-nowrap">
+        Match Modes (2)
+      </button>
       <button onclick="switchTab('tab-accounts')" id="tab-btn-accounts" class="tab-btn border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 px-3 transition whitespace-nowrap">
         Accounts Management
       </button>
@@ -201,6 +204,138 @@ function renderDashboard() {
                 <span class="text-slate-500">JSON</span>
               </div>
               <p class="text-slate-400 mt-1">Server health, memory, and presence statistics</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: Match Modes (Bermuda Classic & Clash Squad) -->
+    <section id="tab-modes" class="tab-content hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div>
+          <h2 class="text-base font-semibold text-slate-100">Supported Match Modes</h2>
+          <p class="text-xs text-slate-400">Available game modes advertised via TCP GameOpeningInfo and Custom Room rules</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Card 1: Bermuda Classic -->
+          <div class="bg-slate-950 border border-amber-500/30 rounded-xl overflow-hidden flex flex-col justify-between">
+            <div class="p-5 space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <h3 class="text-lg font-bold text-slate-100">Bermuda Classic</h3>
+                </div>
+                <span class="px-2.5 py-1 rounded text-xs font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  Battle Royale
+                </span>
+              </div>
+
+              <p class="text-xs text-slate-400">
+                Classic Battle Royale on Bermuda island (Paradise). Supports Solo, Duo, and Squad survival matches with up to 48 players.
+              </p>
+
+              <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                <div class="bg-slate-900 p-2 rounded border border-slate-800">
+                  <span class="text-slate-500 block text-[10px] uppercase font-sans">Game Mode ID</span>
+                  <span class="text-emerald-400 font-bold">1 (BattleRoyale)</span>
+                </div>
+                <div class="bg-slate-900 p-2 rounded border border-slate-800">
+                  <span class="text-slate-500 block text-[10px] uppercase font-sans">Map ID / Config</span>
+                  <span class="text-amber-400 font-bold">Map 1 / Config 1001</span>
+                </div>
+                <div class="bg-slate-900 p-2 rounded border border-slate-800">
+                  <span class="text-slate-500 block text-[10px] uppercase font-sans">Group Modes</span>
+                  <span class="text-slate-200">Solo, Duo, Squad</span>
+                </div>
+                <div class="bg-slate-900 p-2 rounded border border-slate-800">
+                  <span class="text-slate-500 block text-[10px] uppercase font-sans">Max Members</span>
+                  <span class="text-slate-200">48 / 30 / 20 Players</span>
+                </div>
+              </div>
+
+              <div class="space-y-1.5 text-xs text-slate-300">
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  <span>Advertised in <code class="font-mono text-amber-400 text-[11px]">GameOpeningInfoReq</code> (Proto 3, Cmd 7)</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  <span>Accepted in <code class="font-mono text-amber-400 text-[11px]">MatchmakingStartReq</code> queue</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  <span>Custom Room creation rules & Classic drop presets enabled</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 bg-slate-900/60 border-t border-slate-800 flex items-center justify-between text-xs">
+              <span class="text-slate-400">Match Mode: <strong class="text-slate-200">Classic (1)</strong></span>
+              <span class="text-emerald-400 font-semibold flex items-center">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5"></span> Enabled
+              </span>
+            </div>
+          </div>
+
+          <!-- Card 2: Clash Squad -->
+          <div class="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden flex flex-col justify-between">
+            <div class="p-5 space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <h3 class="text-lg font-bold text-slate-100">Clash Squad (CS)</h3>
+                </div>
+                <span class="px-2.5 py-1 rounded text-xs font-semibold bg-sky-500/20 text-sky-400 border border-sky-500/30">
+                  Round-based 4v4
+                </span>
+              </div>
+
+              <p class="text-xs text-slate-400">
+                Tactical 4v4 round-based combat on Bermuda with buy phase economy, advanced custom room settings, and MVP screens.
+              </p>
+
+              <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                <div class="bg-slate-900 p-2 rounded border border-slate-800">
+                  <span class="text-slate-500 block text-[10px] uppercase font-sans">Game Mode ID</span>
+                  <span class="text-sky-400 font-bold">15 (Clash Squad)</span>
+                </div>
+                <div class="bg-slate-900 p-2 rounded border border-slate-800">
+                  <span class="text-slate-500 block text-[10px] uppercase font-sans">Map ID / Config</span>
+                  <span class="text-amber-400 font-bold">Map 1 / Config 1015</span>
+                </div>
+                <div class="bg-slate-900 p-2 rounded border border-slate-800">
+                  <span class="text-slate-500 block text-[10px] uppercase font-sans">Group Modes</span>
+                  <span class="text-slate-200">Squad (4v4)</span>
+                </div>
+                <div class="bg-slate-900 p-2 rounded border border-slate-800">
+                  <span class="text-slate-500 block text-[10px] uppercase font-sans">Max Members</span>
+                  <span class="text-slate-200">8 / 6 / 4 / 2 Players</span>
+                </div>
+              </div>
+
+              <div class="space-y-1.5 text-xs text-slate-300">
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  <span>Advertised in <code class="font-mono text-amber-400 text-[11px]">GameOpeningInfoReq</code> (Proto 3, Cmd 7)</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  <span>Accepted in <code class="font-mono text-amber-400 text-[11px]">MatchmakingStartReq</code> queue</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  <span>CS Advanced Economy & Custom Room store configurations</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 bg-slate-900/60 border-t border-slate-800 flex items-center justify-between text-xs">
+              <span class="text-slate-400">Match Mode: <strong class="text-slate-200">Ranked CS (6)</strong></span>
+              <span class="text-emerald-400 font-semibold flex items-center">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5"></span> Enabled
+              </span>
             </div>
           </div>
         </div>

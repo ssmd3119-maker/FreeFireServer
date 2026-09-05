@@ -14,26 +14,48 @@
 
 const { EProtocol, EMatchmaking } = require('../protocol');
 
-// Currently open game modes. Add entries here to open more.
+// Currently open game modes.
+// map_id 1 (Paradise/Bermuda) + game_mode 1 (Battle Royale / Classic) -> config row 1001
+// map_id 1 (Paradise/Bermuda) + game_mode 15 (CS / ContraSquad)        -> config row 1015
+// (see protocol/gamemode_and_map_config.txt)
 const OPEN_MODES = [
-  { 
-    map_id: 1, 
-    game_mode: 15,
-    match_mode: 1, 
-    sort_id: 1, 
-    start_time: "00:00",
-    end_time: "23:59",
-    is_new: true,
+  {
+    map_id: 1,
+    game_mode: 1, // Bermuda Classic (Battle Royale)
+    match_mode: 1,
+    sort_id: 1,
+    start_time: '00:00',
+    end_time: '23:59',
+    is_new: false,
     is_live_open: true,
-    config_start_time: "2020-01-01 00:00:00",
-    config_end_time: "2030-12-31 23:59:59",
-    weekday: "1;2;3;4;5;6;7",
-    tips: "Permanent",
-    language: "en",
+    config_start_time: '2020-01-01 00:00:00',
+    config_end_time: '2030-12-31 23:59:59',
+    weekday: '1;2;3;4;5;6;7',
+    tips: 'Permanent',
+    language: 'en',
     limited_count: 0,
     tag: 1,
-    difficulty: "1",
-    visual_map: "https://foices.github.io/minhas_resources/contra_squad.png"
+    difficulty: '1',
+    visual_map: 'https://foices.github.io/minhas_resources/bermuda.png'
+  },
+  { 
+    map_id: 1, 
+    game_mode: 15, // Clash Squad
+    match_mode: 1, 
+    sort_id: 2, 
+    start_time: '00:00',
+    end_time: '23:59',
+    is_new: true,
+    is_live_open: true,
+    config_start_time: '2020-01-01 00:00:00',
+    config_end_time: '2030-12-31 23:59:59',
+    weekday: '1;2;3;4;5;6;7',
+    tips: 'Permanent',
+    language: 'en',
+    limited_count: 0,
+    tag: 1,
+    difficulty: '1',
+    visual_map: 'https://foices.github.io/minhas_resources/contra_squad.png'
   }
 ];
 

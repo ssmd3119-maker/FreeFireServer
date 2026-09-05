@@ -16,6 +16,7 @@ const { lookup } = require('../protocol/protos');
 // this enum and ONLY fills the MVP screen's stat labels/values when it == CS — otherwise
 // UIHudMatchResultMVPShowController.SetData returns early and the labels stay at their
 // prefab placeholders ("DSDSA"/0). Our matches are Clash Squad.
+const EGAMEMODE_BR = 1;
 const EGAMEMODE_CS = 15;
 
 // One proto.TeammateStats scoreboard row. `deads` = deaths; `score` is a simple
@@ -45,12 +46,13 @@ function teammateRow(pr, acct) {
 // The tcp.MatchStatsRes CONTENT bytes for ONE player (pr). Splits ALL players into
 // `teammates` (same win outcome as pr = pr's team, self included) and `opponents` (the
 // other team) — this is a team-based mode (CS), so a shared win/lose IS the team.
-function buildStatsRes(pr, players, accts, matchId) {
+function buildStatsRes(pr, players, accts, matchId, gameMode = 15) {
   const MatchStatsRes = lookup('MatchStatsRes');
   const MatchStats = lookup('MatchStats');
   const MatchIncome = lookup('MatchIncome');
   if (!MatchStatsRes || !MatchStats || !MatchIncome) return null;
 
+  const resolvedMode = (gameMode === 1 || pr.game_mode === 1) ? EGAMEMODE_BR : EGAMEMODE_CS;
   const acctOf = (id) => (accts || {})[id] || {};
   const a = acctOf(pr.account_id);
   const role = a.role || 0;
@@ -74,7 +76,7 @@ function buildStatsRes(pr, players, accts, matchId) {
     rank: pr.win ? 1 : 2,
     ranking_points: pr.rank_points | 0,
     match_mode: 1,
-    game_mode: EGAMEMODE_CS, // gates the MVP screen (SetData) — 0 => placeholder labels
+    game_mode: resolvedMode, // gates the MVP screen (SetData) — 0 => placeholder labels
     player_count: players.length,
     real_player_count: players.length,
     level,

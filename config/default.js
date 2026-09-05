@@ -63,7 +63,17 @@ module.exports = {
   },
   // --- infra migration (Phase 0+) -------------------------------------------
   // Redis event bus (Streams + PubSub); consumed by the bus client in src/bus.
-  redis: { url: process.env.REDIS_URL || '' },
+  // In containerized environments, REDIS_URL may point to 127.0.0.1:6379 by default
+  // without a redis-server installed; fall back to the in-memory bus unless USE_REDIS is explicitly set.
+  redis: {
+    url: (function () {
+      const u = process.env.REDIS_URL || '';
+      if (!u) return '';
+      if (process.env.USE_REDIS === 'true') return u;
+      if (u.includes('127.0.0.1') || u.includes('localhost')) return '';
+      return u;
+    })()
+  },
   // PostgreSQL (Phase 1+). Empty keeps the SQLite path (db.file) in use.
   postgres: { url: (process.env.USE_POSTGRES === 'true' && (process.env.DATABASE_URL || process.env.DB_URL)) || '' },
   // --- auth / login hardening ----------------------------------------------

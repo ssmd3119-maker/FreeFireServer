@@ -44,7 +44,7 @@ async function pushMatchStats(mr, repo, bus) {
   let pushed = 0;
   for (const pr of mr.players) {
     if (!(await bus.getNode(pr.account_id))) continue; // offline -> nothing to show
-    const content = buildStatsRes(pr, mr.players, accts, mr.match_id);
+    const content = buildStatsRes(pr, mr.players, accts, mr.match_id, mr.game_mode || pr.game_mode || 15);
     if (!content) continue;
     await bus.publishPS('gw.push', 'GatewayPush', {
       target_account_id: pr.account_id,

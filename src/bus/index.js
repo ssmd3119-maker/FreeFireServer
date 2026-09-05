@@ -24,8 +24,12 @@ class Bus {
   }
 
   _connect() {
-    const conn = new Redis(this.url);
-    conn.on('error', (err) => logger.error(`[bus] redis: ${err.message}`));
+    const conn = new Redis(this.url, {
+      maxRetriesPerRequest: 3,
+      retryStrategy: (times) => (times > 3 ? null : Math.min(times * 100, 1000)),
+      enableOfflineQueue: false
+    });
+    conn.on('error', (err) => logger.warn(`[bus] redis: ${err.message}`));
     this._conns.push(conn);
     return conn;
   }
