@@ -9,7 +9,7 @@
 'use strict';
 
 const { requireAccount, randInt } = require('./_shared');
-const { LUCKY_ROYALE_WHEELS } = require('../data/shopCatalog');
+const { getWheelById, getAllWheels } = require('../services/shopService');
 
 const AWARD_TYPE_ITEM = 1;
 
@@ -29,7 +29,8 @@ function handlePurchaseGacha(reqObj, ctx) {
   if (!account) return {};
 
   const chestId = Number(reqObj.chest_id || 1001);
-  const wheel = LUCKY_ROYALE_WHEELS.find((w) => w.chest_id === chestId) || LUCKY_ROYALE_WHEELS[0];
+  const wheels = getAllWheels();
+  const wheel = getWheelById(chestId) || wheels[0];
 
   // gacha_type === 2 indicates a x10 (multi) pull
   const isMulti = Number(reqObj.gacha_type) === 2 || Number(reqObj.count) === 10;

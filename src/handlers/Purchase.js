@@ -10,7 +10,7 @@
 'use strict';
 
 const { requireAccount, nowSecs } = require('./_shared');
-const { STORE_ITEMS } = require('../data/shopCatalog');
+const { getStoreItemById } = require('../services/shopService');
 
 function handlePurchase(reqObj, ctx) {
   const account = requireAccount(ctx);
@@ -20,9 +20,7 @@ function handlePurchase(reqObj, ctx) {
   const cnt = Math.max(1, Number(reqObj.cnt || 1));
 
   // Find in store catalog if possible
-  const catalogItem = STORE_ITEMS.find(
-    (it) => it.store_id === storeItemId || it.item_id === storeItemId
-  );
+  const catalogItem = getStoreItemById(storeItemId);
 
   const realItemId = catalogItem ? catalogItem.item_id : storeItemId;
   let coinsCost = 0;

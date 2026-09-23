@@ -313,62 +313,163 @@ router.get('/game-modes', (req, res) => {
   });
 });
 
-// 13. Shop / Store Catalog
-const { STORE_ITEMS, LUCKY_ROYALE_WHEELS } = require('../data/shopCatalog');
+// 13. Shop / Store Catalog (CRUD & Persistence)
+const shopService = require('../services/shopService');
 
 router.get('/shop', (req, res) => {
-  const category = req.query.category;
-  let items = STORE_ITEMS;
-  if (category) {
-    items = items.filter((it) => it.type_override && it.type_override.startsWith(category));
+  try {
+    const { category, search, tag } = req.query;
+    const items = shopService.getAllStoreItems({ category, search, tag });
+    res.json({
+      total: items.length,
+      items
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-  res.json({
-    total: items.length,
-    items
-  });
 });
 
-// 14. Lucky Royale Wheels & Spin Simulation
+router.get('/shop/tabs', (req, res) => {
+  try {
+    res.json({ tabs: shopService.getStoreTabs() });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/shop/:id', (req, res) => {
+  try {
+    const item = shopService.getStoreItemById(req.params.id);
+    if (!item) return res.status(404).json({ error: 'Item not found in store' });
+    res.json({ item });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/shop', (req, res) => {
+  try {
+    const created = shopService.addStoreItem(req.body);
+    res.status(201).json({ ok: true, item: created });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.put('/shop/:id', (req, res) => {
+  try {
+    const updated = shopService.updateStoreItem(req.params.id, req.body);
+    res.json({ ok: true, item: updated });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.delete('/shop/:id', (req, res) => {
+  try {
+    const removed = shopService.deleteStoreItem(req.params.id);
+    res.json({ ok: true, removed });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.post('/shop/reset', (req, res) => {
+  try {
+    const items = shopService.resetShopCatalog();
+    res.json({ ok: true, message: 'Shop catalog reset to default items', count: items.length });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 14. Lucky Royale Wheels & Management
 router.get('/gacha', (req, res) => {
-  res.json({
-    wheels: LUCKY_ROYALE_WHEELS
-  });
+  try {
+    const wheels = shopService.getAllWheels();
+    res.json({ wheels });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/gacha/:chestId', (req, res) => {
+  try {
+    const wheel = shopService.getWheelById(req.params.chestId);
+    if (!wheel) return res.status(404).json({ error: 'Wheel not found' });
+    res.json({ wheel });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/gacha', (req, res) => {
+  try {
+    const created = shopService.addWheel(req.body);
+    res.status(201).json({ ok: true, wheel: created });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.put('/gacha/:chestId', (req, res) => {
+  try {
+    const updated = shopService.updateWheel(req.params.chestId, req.body);
+    res.json({ ok: true, wheel: updated });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.delete('/gacha/:chestId', (req, res) => {
+  try {
+    const removed = shopService.deleteWheel(req.params.chestId);
+    res.json({ ok: true, removed });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.post('/gacha/:chestId/items', (req, res) => {
+  try {
+    const reward = shopService.addWheelReward(req.params.chestId, req.body);
+    res.status(201).json({ ok: true, reward });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.put('/gacha/:chestId/items/:itemId', (req, res) => {
+  try {
+    const reward = shopService.updateWheelReward(req.params.chestId, req.params.itemId, req.body);
+    res.json({ ok: true, reward });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.delete('/gacha/:chestId/items/:itemId', (req, res) => {
+  try {
+    const removed = shopService.deleteWheelReward(req.params.chestId, req.params.itemId);
+    res.json({ ok: true, removed });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 router.post('/gacha/spin', (req, res) => {
-  const chestId = Number(req.body.chest_id || 1001);
-  const count = Number(req.body.count || 1);
-  const wheel = LUCKY_ROYALE_WHEELS.find((w) => w.chest_id === chestId) || LUCKY_ROYALE_WHEELS[0];
-
-  const totalWeight = wheel.reward_items.reduce((acc, it) => acc + (it.weight || 10), 0);
-  const results = [];
-  let hasJackpot = false;
-
-  for (let i = 0; i < count; i += 1) {
-    let r = Math.floor(Math.random() * totalWeight);
-    let chosen = wheel.reward_items[0];
-    for (const it of wheel.reward_items) {
-      const w = it.weight || 10;
-      if (r < w) {
-        chosen = it;
-        break;
-      }
-      r -= w;
-    }
-    if (chosen.reward_level >= 3 || chosen.item_id === wheel.grand_prize_id) {
-      hasJackpot = true;
-    }
-    results.push(chosen);
+  try {
+    const { chest_id, count } = req.body;
+    const result = shopService.simulateSpin(chest_id, count);
+    const wheel = shopService.getWheelById(chest_id) || {};
+    res.json({
+      ...result,
+      currency_name: wheel.currency_name || 'Gems',
+      total_cost: count > 1 ? wheel.ten_price : wheel.once_price
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
-
-  res.json({
-    chest_id: wheel.chest_id,
-    chest_name: wheel.chest_name,
-    currency_name: wheel.currency_name,
-    total_cost: count > 1 ? wheel.ten_price : wheel.once_price,
-    has_jackpot: hasJackpot,
-    drops: results
-  });
 });
 
 // 15. Global Rankings Service (Bermuda & Clash Squad)

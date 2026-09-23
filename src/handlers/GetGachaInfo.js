@@ -9,13 +9,14 @@
 'use strict';
 
 const { requireAccount } = require('./_shared');
-const { LUCKY_ROYALE_WHEELS } = require('../data/shopCatalog');
+const { getAllWheels } = require('../services/shopService');
 
 function handleGetGachaInfo(reqObj, ctx) {
   const account = requireAccount(ctx);
   if (!account) return {};
 
-  const gachaInfoList = LUCKY_ROYALE_WHEELS.map((w) => ({
+  const wheels = getAllWheels();
+  const gachaInfoList = wheels.map((w) => ({
     chest_id: w.chest_id,
     lottery_count_weekly: 0,
     next_free_time: 0,

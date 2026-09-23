@@ -466,37 +466,29 @@ function renderDashboard() {
 
     <!-- TAB: Shop & Lucky Royale -->
     <section id="tab-shop" class="tab-content hidden space-y-6">
-      <!-- Lucky Royale Simulator Card -->
+      <!-- Lucky Royale Management & Simulator Card -->
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div class="flex items-center space-x-2">
               <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
-              <h2 class="text-base font-semibold text-slate-100">Lucky Royale Simulator</h2>
+              <h2 class="text-base font-semibold text-slate-100">Lucky Royale Management & Simulator</h2>
             </div>
-            <p class="text-xs text-slate-400">Experience gacha spin pulls with real drop odds, jackpot effects, and inventory persistence</p>
+            <p class="text-xs text-slate-400">Configure wheels, customize prize pools, calibrate drop odds, and simulate live gacha pulls</p>
           </div>
           <div class="flex items-center space-x-2 text-xs">
             <span class="px-2.5 py-1 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">Endpoints: GetGachaDesc (153) • GetGachaInfo (154) • PurchaseGacha (158)</span>
           </div>
         </div>
 
-        <!-- Wheel Selector Tabs -->
-        <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-3" id="wheel-selector-buttons">
-          <button onclick="selectWheel(1001)" id="wheel-btn-1001" class="wheel-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 text-slate-950 transition">
-            💎 Diamond Royale
-          </button>
-          <button onclick="selectWheel(1002)" id="wheel-btn-1002" class="wheel-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
-            🪙 Gold Royale
-          </button>
-          <button onclick="selectWheel(1003)" id="wheel-btn-1003" class="wheel-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
-            🔫 Weapon Royale
-          </button>
-          <button onclick="selectWheel(1004)" id="wheel-btn-1004" class="wheel-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
-            🧬 Incubator
-          </button>
-          <button onclick="selectWheel(1005)" id="wheel-btn-1005" class="wheel-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
-            🎡 Faded Wheel
+        <!-- Wheel Selector Tabs & Add Wheel Button -->
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div class="flex flex-wrap items-center gap-2" id="wheel-selector-buttons">
+            <!-- Populated dynamically by loadWheels() -->
+          </div>
+          <button onclick="openAddWheelModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center shadow-lg shadow-emerald-950">
+            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            + Add Wheel
           </button>
         </div>
 
@@ -506,10 +498,20 @@ function renderDashboard() {
             <div class="flex items-center justify-center md:justify-start space-x-2">
               <h3 id="active-wheel-title" class="text-base font-bold text-slate-100">Diamond Royale</h3>
               <span id="active-wheel-badge" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-sky-500/20 text-sky-400 border border-sky-500/30">Diamonds</span>
+              <span id="active-wheel-id-badge" class="px-2 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-slate-900 border border-slate-800">Chest #1001</span>
             </div>
             <p id="active-wheel-grandprize" class="text-xs text-amber-400">Grand Prize: Sakura Kimono Bundle (Legendary)</p>
           </div>
-          <div class="flex items-center space-x-3">
+          <div class="flex flex-wrap items-center justify-center gap-2">
+            <button onclick="openEditWheelModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center">
+              <svg class="w-3.5 h-3.5 mr-1 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              Edit Wheel
+            </button>
+            <button onclick="deleteActiveWheel()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition flex items-center">
+              <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              Delete
+            </button>
+            <div class="h-6 w-px bg-slate-800 mx-1 hidden sm:block"></div>
             <button id="btn-spin-1" onclick="spinActiveWheel(1)" class="px-4 py-2 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-lg shadow-amber-500/10 transition flex items-center">
               <span>Spin 1x</span>
               <span id="spin-1-price" class="ml-1.5 font-mono text-[11px] opacity-80">(60 💎)</span>
@@ -536,31 +538,79 @@ function renderDashboard() {
           </div>
         </div>
 
-        <!-- Reward Pool Preview -->
-        <div>
-          <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Available Prize Pool & Drop Odds</h4>
+        <!-- Reward Pool Preview & Management Header -->
+        <div class="space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Available Prize Pool & Drop Odds</h4>
+              <p class="text-[11px] text-slate-500">Tune individual drop weights to control exact item probabilities for clients</p>
+            </div>
+            <button onclick="openAddPrizeModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 transition flex items-center self-start sm:self-auto">
+              <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              + Add Prize to Pool
+            </button>
+          </div>
           <div id="wheel-pool-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             <!-- Dynamic pool list -->
           </div>
         </div>
       </div>
 
-      <!-- Shop Catalog Section -->
+      <!-- Shop Catalog Section & Item Management -->
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <h2 class="text-base font-semibold text-slate-100">In-Game Store Catalog (GetStore)</h2>
-            <p class="text-xs text-slate-400">Browse characters, legendary outfits, evolution weapons, and cosmetics delivered via CSGetStoreRes</p>
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse"></span>
+              <h2 class="text-base font-semibold text-slate-100">In-Game Store Catalog & Mall Management</h2>
+            </div>
+            <p class="text-xs text-slate-400">Add, edit, discount, or remove characters, outfits, weapons, emotes, and pets delivered via GetStore (CSGetStoreRes)</p>
           </div>
+
+          <!-- Store Stats & Top Actions -->
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="flex items-center space-x-2 text-xs font-mono bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5">
+              <span class="text-slate-400">Total Items:</span>
+              <span id="stat-shop-total" class="font-bold text-amber-400">0</span>
+            </div>
+            <button onclick="openAddStoreItemModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow-lg shadow-amber-500/10 transition flex items-center">
+              <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              + Add Store Item
+            </button>
+            <button onclick="resetShopCatalog()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition" title="Restore standard default catalog">
+              Reset Catalog
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter, Category & Search Bar -->
+        <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-2 border-t border-slate-800/80">
           <!-- Shop Category Filters -->
-          <div class="flex items-center space-x-1.5 overflow-x-auto text-xs font-medium">
-            <button onclick="filterShop('all')" id="shop-filter-all" class="shop-filter-btn px-2.5 py-1 rounded bg-amber-500 text-slate-950 font-bold">All</button>
-            <button onclick="filterShop('7')" id="shop-filter-7" class="shop-filter-btn px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">Characters</button>
-            <button onclick="filterShop('8')" id="shop-filter-8" class="shop-filter-btn px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">Bundles</button>
-            <button onclick="filterShop('9')" id="shop-filter-9" class="shop-filter-btn px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">Weapons</button>
-            <button onclick="filterShop('11')" id="shop-filter-11" class="shop-filter-btn px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">Emotes</button>
-            <button onclick="filterShop('12')" id="shop-filter-12" class="shop-filter-btn px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">Pets</button>
-            <button onclick="filterShop('10')" id="shop-filter-10" class="shop-filter-btn px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">Props</button>
+          <div class="flex items-center space-x-1.5 overflow-x-auto text-xs font-medium pb-1 md:pb-0">
+            <button onclick="filterShop('all')" id="shop-filter-all" class="shop-filter-btn px-2.5 py-1 rounded bg-amber-500 text-slate-950 font-bold whitespace-nowrap">All</button>
+            <button onclick="filterShop('7')" id="shop-filter-7" class="shop-filter-btn px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap">Characters</button>
+            <button onclick="filterShop('8')" id="shop-filter-8" class="shop-filter-btn px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap">Bundles</button>
+            <button onclick="filterShop('9')" id="shop-filter-9" class="shop-filter-btn px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap">Weapons</button>
+            <button onclick="filterShop('11')" id="shop-filter-11" class="shop-filter-btn px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap">Emotes</button>
+            <button onclick="filterShop('12')" id="shop-filter-12" class="shop-filter-btn px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap">Pets</button>
+            <button onclick="filterShop('6')" id="shop-filter-6" class="shop-filter-btn px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap">Fashion</button>
+            <button onclick="filterShop('10')" id="shop-filter-10" class="shop-filter-btn px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap">Props</button>
+          </div>
+
+          <!-- Tag & Search Filters -->
+          <div class="flex items-center space-x-2">
+            <select id="shop-tag-select" onchange="filterShopByTag(this.value)" class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-slate-300 focus:outline-none focus:border-amber-500">
+              <option value="all">All Tags</option>
+              <option value="0">Regular (None)</option>
+              <option value="1">Discount / Sale</option>
+              <option value="2">Hot</option>
+              <option value="3">New</option>
+              <option value="4">Limited Time</option>
+            </select>
+            <div class="relative flex-1 sm:w-56">
+              <input id="input-shop-search" oninput="onShopSearch(this.value)" type="text" placeholder="Search by name or ID..." class="w-full bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-1 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500" />
+              <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
           </div>
         </div>
 
@@ -1001,6 +1051,205 @@ function renderDashboard() {
     </div>
   </div>
 
+  <!-- Store Item Modal (Add & Edit) -->
+  <div id="modal-store-item" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-lg w-full p-5 space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 id="modal-store-title" class="text-sm font-bold text-slate-100 flex items-center">
+          <span class="w-2 h-2 rounded-full bg-amber-400 mr-2"></span> Add Store Item
+        </h3>
+        <button onclick="closeStoreItemModal()" class="text-slate-400 hover:text-slate-200 text-sm">✕</button>
+      </div>
+      <form id="form-store-item" onsubmit="saveStoreItem(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="store-form-id" value="" />
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 mb-1 font-medium">Item ID (In-game ID) *</label>
+            <input id="store-input-item-id" type="number" required placeholder="e.g. 102000035" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-amber-500" />
+            <span class="text-[10px] text-slate-500">Character, skin, bundle or emote ID</span>
+          </div>
+          <div>
+            <label class="block text-slate-300 mb-1 font-medium">Category *</label>
+            <select id="store-input-category" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500">
+              <option value="7;0">Characters (Tab 7)</option>
+              <option value="8;0">Bundles & Outfits (Tab 8)</option>
+              <option value="9;0">Weapon Skins (Tab 9)</option>
+              <option value="11;0">Emotes & Collections (Tab 11)</option>
+              <option value="12;0">Pet Companions (Tab 12)</option>
+              <option value="6;0">Fashion & Clothes (Tab 6)</option>
+              <option value="10;0">Crates & Consumables (Tab 10)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 mb-1 font-medium">Item Name *</label>
+          <input id="store-input-name" type="text" required placeholder="e.g. DJ Alok, Sakura Kimono Bundle" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-slate-300 mb-1 font-medium">Diamonds (💎) Price</label>
+            <input id="store-input-gems" type="number" min="0" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-amber-500" />
+          </div>
+          <div>
+            <label class="block text-slate-300 mb-1 font-medium">Gold Coins (🪙) Price</label>
+            <input id="store-input-coins" type="number" min="0" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-amber-500" />
+          </div>
+          <div>
+            <label class="block text-slate-300 mb-1 font-medium">Discount Price (💎)</label>
+            <input id="store-input-discount" type="number" min="0" value="0" placeholder="0 = no discount" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-amber-500" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 mb-1 font-medium">Tag Badge</label>
+            <select id="store-input-tag" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500">
+              <option value="0">None (Normal)</option>
+              <option value="1">Sale / Discount (1)</option>
+              <option value="2">Hot (2)</option>
+              <option value="3">New (3)</option>
+              <option value="4">Limited Time (4)</option>
+            </select>
+          </div>
+          <div class="flex items-center space-x-4 pt-5">
+            <label class="flex items-center space-x-2 cursor-pointer text-slate-300">
+              <input id="store-input-recommended" type="checkbox" class="rounded bg-slate-950 border-slate-800 text-amber-500 focus:ring-0" />
+              <span>Recommended</span>
+            </label>
+            <label class="flex items-center space-x-2 cursor-pointer text-slate-300">
+              <input id="store-input-new" type="checkbox" class="rounded bg-slate-950 border-slate-800 text-amber-500 focus:ring-0" />
+              <span>New Flag</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 mb-1 font-medium">Description</label>
+          <textarea id="store-input-desc" rows="2" placeholder="Item description, active skill stats, lore..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500"></textarea>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeStoreItemModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">Cancel</button>
+          <button type="submit" id="btn-save-store-item" class="px-4 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition">Save Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lucky Royale Wheel Modal (Add & Edit) -->
+  <div id="modal-gacha-wheel" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 id="modal-wheel-title" class="text-sm font-bold text-slate-100 flex items-center">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2"></span> Add Lucky Royale Wheel
+        </h3>
+        <button onclick="closeWheelModal()" class="text-slate-400 hover:text-slate-200 text-sm">✕</button>
+      </div>
+      <form id="form-gacha-wheel" onsubmit="saveWheel(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="wheel-form-id" value="" />
+
+        <div>
+          <label class="block text-slate-300 mb-1 font-medium">Wheel Chest ID *</label>
+          <input id="wheel-input-id" type="number" required placeholder="e.g. 1006" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-amber-500" />
+          <span class="text-[10px] text-slate-500">Unique numeric chest identifier</span>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 mb-1 font-medium">Wheel Name *</label>
+          <input id="wheel-input-name" type="text" required placeholder="e.g. Hyperbook Royale, Supercar Wheel" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
+        </div>
+
+        <div>
+          <label class="block text-slate-300 mb-1 font-medium">Spin Currency *</label>
+          <select id="wheel-input-coin-type" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500">
+            <option value="2">Diamonds (💎 Gems)</option>
+            <option value="1">Gold Coins (🪙 Gold)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 mb-1 font-medium">Spin 1x Price</label>
+            <input id="wheel-input-once-price" type="number" min="1" required value="60" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-amber-500" />
+          </div>
+          <div>
+            <label class="block text-slate-300 mb-1 font-medium">Spin 10+1x Price</label>
+            <input id="wheel-input-ten-price" type="number" min="1" required value="540" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-amber-500" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 mb-1 font-medium">Grand Prize Item ID *</label>
+            <input id="wheel-input-gp-id" type="number" required placeholder="e.g. 203000181" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-amber-500" />
+          </div>
+          <div>
+            <label class="block text-slate-300 mb-1 font-medium">Grand Prize Name *</label>
+            <input id="wheel-input-gp-name" type="text" required placeholder="e.g. Sakura Kimono Bundle" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
+          </div>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closeWheelModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">Cancel</button>
+          <button type="submit" id="btn-save-wheel" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition">Save Wheel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lucky Royale Prize Pool Item Modal (Add & Edit) -->
+  <div id="modal-gacha-prize" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 id="modal-prize-title" class="text-sm font-bold text-slate-100 flex items-center">
+          <span class="w-2 h-2 rounded-full bg-amber-400 mr-2"></span> Add Prize to Pool
+        </h3>
+        <button onclick="closePrizeModal()" class="text-slate-400 hover:text-slate-200 text-sm">✕</button>
+      </div>
+      <form id="form-gacha-prize" onsubmit="savePrize(event)" class="space-y-3 text-xs">
+        <input type="hidden" id="prize-form-chest-id" value="" />
+        <input type="hidden" id="prize-form-old-item-id" value="" />
+
+        <div>
+          <label class="block text-slate-300 mb-1 font-medium">Item ID *</label>
+          <input id="prize-input-id" type="number" required placeholder="e.g. 102000004" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-amber-500" />
+        </div>
+
+        <div>
+          <label class="block text-slate-300 mb-1 font-medium">Item Name *</label>
+          <input id="prize-input-name" type="text" required placeholder="e.g. AK47 Blue Flame Draco" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 mb-1 font-medium">Rarity / Glow</label>
+            <select id="prize-input-level" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-amber-500">
+              <option value="3">Legendary ★★★ (Gold)</option>
+              <option value="2">Rare ★★ (Purple)</option>
+              <option value="1">Normal ★ (Standard)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-300 mb-1 font-medium">Drop Weight *</label>
+            <input id="prize-input-weight" type="number" min="1" max="1000" required value="10" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-amber-500" />
+          </div>
+        </div>
+
+        <p class="text-[11px] text-slate-400 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
+          💡 <span class="font-semibold text-slate-300">Drop Odds Hint:</span> Drop percentage = (Item Weight / Total Pool Weight) × 100%. Set lower weight (e.g. 3) for jackpot, higher weight (e.g. 50) for common drops.
+        </p>
+
+        <div class="flex justify-end space-x-2 pt-3 border-t border-slate-800">
+          <button type="button" onclick="closePrizeModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">Cancel</button>
+          <button type="submit" id="btn-save-prize" class="px-4 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition">Save Prize</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     let allEndpoints = [];
     let searchDebounceTimer = null;
@@ -1030,7 +1279,7 @@ function renderDashboard() {
     }
 
     async function loadAllData() {
-      await Promise.all([loadStats(), loadAccounts(), loadRankingsSummary()]);
+      await Promise.all([loadStats(), loadAccounts(), loadRankingsSummary(), loadShopData()]);
     }
 
     async function loadStats() {
@@ -1202,60 +1451,13 @@ function renderDashboard() {
         }
         
         if (data.message) text += 'Summary: ' + data.message + '\\n';
-        if (data.error) text += 'Error: ' + data.error + '\\n';
-        
-        output.textContent = text;
-        badge.textContent = data.success ? 'TEST PASSED' : 'TEST FAILED';
-        badge.className = 'px-2 py-0.5 rounded text-xs ' + (data.success ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30');
-        
-        // Refresh accounts and stats
-        loadAllData();
-      } catch (err) {
-        output.textContent = 'Handshake test execution error: ' + err.message;
-        badge.textContent = 'ERROR';
-        badge.className = 'px-2 py-0.5 rounded text-xs bg-rose-500/20 text-rose-400 border border-rose-500/30';
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Run Handshake Test';
-      }
-    }
-
-    function openCreateAccountModal() {
-      document.getElementById('modal-create-account').classList.remove('hidden');
-    }
-    function closeCreateAccountModal() {
-      document.getElementById('modal-create-account').classList.add('hidden');
-    }
-
-    async function handleCreateAccount(e) {
-      e.preventDefault();
-      const nickname = document.getElementById('create-nickname').value.trim();
-      const level = Number(document.getElementById('create-level').value) || 1;
-      const gold = Number(document.getElementById('create-gold').value) || 5000;
-      
-      try {
-        const res = await fetch('/api/accounts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nickname, level, gold })
-        });
-        const data = await res.json();
-        if (res.ok) {
-          closeCreateAccountModal();
-          document.getElementById('create-nickname').value = '';
-          loadAccounts();
-          loadStats();
-        } else {
-          alert('Failed to create account: ' + (data.error || 'Unknown error'));
-        }
-      } catch (err) {
-        alert('Network error: ' + err.message);
-      }
-    }
-
-    // Shop & Lucky Royale Simulator Logic
+    // ----------------------------------------------------
+    // STORE & LUCKY ROYALE MANAGEMENT LOGIC
+    // ----------------------------------------------------
     let allShopItems = [];
     let currentShopCategory = 'all';
+    let currentShopTag = 'all';
+    let currentShopSearch = '';
     let allWheels = [];
     let currentWheelId = 1001;
 
@@ -1263,81 +1465,138 @@ function renderDashboard() {
       await Promise.all([loadShop(), loadWheels()]);
     }
 
+    // --- STORE CATALOG MANAGEMENT ---
+
     async function loadShop(category = currentShopCategory) {
       currentShopCategory = category;
       const grid = document.getElementById('shop-items-grid');
       try {
-        const url = category && category !== 'all' ? '/api/shop?category=' + encodeURIComponent(category) : '/api/shop';
-        const res = await fetch(url);
+        const res = await fetch('/api/shop');
         const data = await res.json();
         allShopItems = data.items || [];
 
-        if (allShopItems.length === 0) {
-          grid.innerHTML = '<div class="col-span-full py-8 text-center text-slate-500">No items found in this category.</div>';
-          return;
-        }
+        // Update stats
+        const totalSpan = document.getElementById('stat-shop-total');
+        if (totalSpan) totalSpan.textContent = allShopItems.length;
 
-        const tagBadges = {
-          0: '',
-          1: '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">SALE</span>',
-          2: '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">HOT</span>',
-          3: '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">NEW</span>',
-          4: '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/20 text-purple-400 border border-purple-500/30">LIMITED</span>'
-        };
-
-        const categoryLabels = {
-          '7': 'Character',
-          '8': 'Outfit Bundle',
-          '9': 'Weapon Skin',
-          '11': 'Collection & Emote',
-          '12': 'Pet Companion',
-          '10': 'Voucher / Consumable'
-        };
-
-        grid.innerHTML = allShopItems.map(item => {
-          const catPrefix = (item.type_override || '').split(';')[0];
-          const catName = categoryLabels[catPrefix] || 'Store Item';
-          const tagHtml = tagBadges[item.tag_type] || '';
-
-          let priceHtml = '';
-          if (item.gems_price > 0) {
-            const displayGems = item.discount_price ? item.discount_price : item.gems_price;
-            const originalGems = item.discount_price ? \`<span class="line-through text-slate-500 mr-1 text-[11px]">\${item.gems_price}</span>\` : '';
-            priceHtml += \`<span class="font-bold text-sky-400 flex items-center font-mono">💎 \${originalGems}\${displayGems}</span>\`;
-          }
-          if (item.coins_price > 0) {
-            if (priceHtml) priceHtml += '<span class="text-slate-600 mx-1.5">•</span>';
-            priceHtml += \`<span class="font-bold text-amber-400 flex items-center font-mono">🪙 \${item.coins_price.toLocaleString()}</span>\`;
-          }
-          if (!priceHtml) {
-            priceHtml = '<span class="text-emerald-400 font-bold">FREE</span>';
-          }
-
-          return \`
-            <div class="bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl p-4 flex flex-col justify-between transition group">
-              <div class="space-y-2">
-                <div class="flex items-start justify-between gap-2">
-                  <div>
-                    <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-500 block">\${catName}</span>
-                    <h4 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">\${escapeHtml(item.name)}</h4>
-                  </div>
-                  \${tagHtml}
-                </div>
-                <p class="text-xs text-slate-400 line-clamp-2">\${escapeHtml(item.desc || '')}</p>
-              </div>
-
-              <div class="mt-4 pt-3 border-t border-slate-900 flex items-center justify-between text-xs">
-                <div class="flex items-center">
-                  \${priceHtml}
-                </div>
-                <span class="text-[10px] font-mono text-slate-500">ID: \${item.item_id}</span>
-              </div>
-            </div>
-          \`;
-        }).join('');
+        renderShopGrid();
       } catch (err) {
         grid.innerHTML = '<div class="col-span-full py-8 text-center text-rose-400">Error loading store catalog: ' + escapeHtml(err.message) + '</div>';
       }
+    }
+
+    function renderShopGrid() {
+      const grid = document.getElementById('shop-items-grid');
+      if (!grid) return;
+
+      let filtered = allShopItems;
+
+      // Category filter
+      if (currentShopCategory && currentShopCategory !== 'all') {
+        filtered = filtered.filter(item => {
+          const cat = (item.type_override || '').split(';')[0];
+          return cat === currentShopCategory;
+        });
+      }
+
+      // Tag filter
+      if (currentShopTag !== 'all') {
+        const tagNum = Number(currentShopTag);
+        filtered = filtered.filter(item => Number(item.tag_type || 0) === tagNum);
+      }
+
+      // Search filter
+      if (currentShopSearch.trim()) {
+        const q = currentShopSearch.toLowerCase().trim();
+        filtered = filtered.filter(item =>
+          (item.name && item.name.toLowerCase().includes(q)) ||
+          (item.desc && item.desc.toLowerCase().includes(q)) ||
+          String(item.item_id).includes(q) ||
+          String(item.store_id).includes(q)
+        );
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-500 bg-slate-950/40 rounded-xl border border-slate-800/80">No store items match your current filter. Click "+ Add Store Item" to create one.</div>';
+        return;
+      }
+
+      const tagBadges = {
+        0: '',
+        1: '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">SALE</span>',
+        2: '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">HOT</span>',
+        3: '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">NEW</span>',
+        4: '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/20 text-purple-400 border border-purple-500/30">LIMITED</span>'
+      };
+
+      const categoryLabels = {
+        '7': 'Character',
+        '8': 'Outfit Bundle',
+        '9': 'Weapon Skin',
+        '11': 'Collection & Emote',
+        '12': 'Pet Companion',
+        '6': 'Fashion & Clothes',
+        '10': 'Voucher / Consumable'
+      };
+
+      grid.innerHTML = filtered.map(item => {
+        const catPrefix = (item.type_override || '').split(';')[0];
+        const catName = categoryLabels[catPrefix] || 'Store Item';
+        const tagHtml = tagBadges[item.tag_type] || '';
+
+        let priceHtml = '';
+        if (item.gems_price > 0) {
+          const displayGems = item.discount_price ? item.discount_price : item.gems_price;
+          const originalGems = item.discount_price ? \`<span class="line-through text-slate-500 mr-1 text-[11px]">\${item.gems_price}</span>\` : '';
+          priceHtml += \`<span class="font-bold text-sky-400 flex items-center font-mono">💎 \${originalGems}\${displayGems}</span>\`;
+        }
+        if (item.coins_price > 0) {
+          if (priceHtml) priceHtml += '<span class="text-slate-600 mx-1.5">•</span>';
+          priceHtml += \`<span class="font-bold text-amber-400 flex items-center font-mono">🪙 \${item.coins_price.toLocaleString()}</span>\`;
+        }
+        if (!priceHtml) {
+          priceHtml = '<span class="text-emerald-400 font-bold">FREE</span>';
+        }
+
+        return \`
+          <div class="bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl p-4 flex flex-col justify-between transition group shadow-sm">
+            <div class="space-y-2">
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-500 block">\${catName}</span>
+                  <h4 class="font-bold text-slate-100 text-sm group-hover:text-amber-400 transition">\${escapeHtml(item.name)}</h4>
+                </div>
+                \${tagHtml}
+              </div>
+              <p class="text-xs text-slate-400 line-clamp-2">\${escapeHtml(item.desc || '')}</p>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-900 space-y-3">
+              <div class="flex items-center justify-between text-xs">
+                <div class="flex items-center">
+                  \${priceHtml}
+                </div>
+                <div class="flex items-center space-x-1.5 text-[10px] font-mono text-slate-500">
+                  <span title="Store ID">#\${item.store_id}</span>
+                  <span>•</span>
+                  <span title="Item ID">ID:\${item.item_id}</span>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-end space-x-2 pt-1 border-t border-slate-900/80">
+                <button onclick="openEditStoreItemModal(\${item.store_id})" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center">
+                  <svg class="w-3 h-3 mr-1 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  Edit
+                </button>
+                <button onclick="deleteStoreItem(\${item.store_id})" class="px-2.5 py-1 rounded text-[11px] font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition flex items-center">
+                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        \`;
+      }).join('');
     }
 
     function filterShop(cat) {
@@ -1350,15 +1609,174 @@ function renderDashboard() {
         activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-bold');
         activeBtn.classList.remove('bg-slate-800', 'text-slate-300');
       }
-      loadShop(cat);
+      currentShopCategory = cat;
+      renderShopGrid();
     }
+
+    function filterShopByTag(tag) {
+      currentShopTag = tag;
+      renderShopGrid();
+    }
+
+    function onShopSearch(val) {
+      currentShopSearch = val;
+      renderShopGrid();
+    }
+
+    function openAddStoreItemModal() {
+      document.getElementById('modal-store-title').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400 mr-2"></span> Add In-Game Store Item';
+      document.getElementById('store-form-id').value = '';
+      document.getElementById('store-input-item-id').value = '';
+      document.getElementById('store-input-item-id').disabled = false;
+      document.getElementById('store-input-category').value = '7;0';
+      document.getElementById('store-input-name').value = '';
+      document.getElementById('store-input-gems').value = '599';
+      document.getElementById('store-input-coins').value = '0';
+      document.getElementById('store-input-discount').value = '0';
+      document.getElementById('store-input-tag').value = '0';
+      document.getElementById('store-input-recommended').checked = false;
+      document.getElementById('store-input-new').checked = true;
+      document.getElementById('store-input-desc').value = '';
+      document.getElementById('btn-save-store-item').textContent = 'Add Item';
+      document.getElementById('modal-store-item').classList.remove('hidden');
+    }
+
+    function openEditStoreItemModal(storeId) {
+      const item = allShopItems.find(it => it.store_id === storeId);
+      if (!item) return;
+
+      document.getElementById('modal-store-title').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400 mr-2"></span> Edit In-Game Store Item #' + item.store_id;
+      document.getElementById('store-form-id').value = item.store_id;
+      document.getElementById('store-input-item-id').value = item.item_id;
+      document.getElementById('store-input-item-id').disabled = true;
+      document.getElementById('store-input-category').value = item.type_override || '7;0';
+      document.getElementById('store-input-name').value = item.name || '';
+      document.getElementById('store-input-gems').value = item.gems_price || 0;
+      document.getElementById('store-input-coins').value = item.coins_price || 0;
+      document.getElementById('store-input-discount').value = item.discount_price || 0;
+      document.getElementById('store-input-tag').value = String(item.tag_type || 0);
+      document.getElementById('store-input-recommended').checked = Boolean(item.is_recommended);
+      document.getElementById('store-input-new').checked = Boolean(item.is_new);
+      document.getElementById('store-input-desc').value = item.desc || '';
+      document.getElementById('btn-save-store-item').textContent = 'Update Item';
+      document.getElementById('modal-store-item').classList.remove('hidden');
+    }
+
+    function closeStoreItemModal() {
+      document.getElementById('modal-store-item').classList.add('hidden');
+    }
+
+    async function saveStoreItem(event) {
+      event.preventDefault();
+      const storeId = document.getElementById('store-form-id').value;
+      const itemId = Number(document.getElementById('store-input-item-id').value);
+      const name = document.getElementById('store-input-name').value.trim();
+      const category = document.getElementById('store-input-category').value;
+      const gemsPrice = Number(document.getElementById('store-input-gems').value || 0);
+      const coinsPrice = Number(document.getElementById('store-input-coins').value || 0);
+      const discountPrice = Number(document.getElementById('store-input-discount').value || 0);
+      const tagType = Number(document.getElementById('store-input-tag').value || 0);
+      const isRecommended = document.getElementById('store-input-recommended').checked;
+      const isNew = document.getElementById('store-input-new').checked;
+      const desc = document.getElementById('store-input-desc').value.trim();
+
+      const payload = {
+        item_id: itemId,
+        name,
+        type_override: category,
+        gems_price: gemsPrice,
+        coins_price: coinsPrice,
+        discount_price: discountPrice,
+        tag_type: tagType,
+        is_recommended: isRecommended,
+        is_new: isNew,
+        desc
+      };
+
+      try {
+        let res;
+        if (storeId) {
+          res = await fetch('/api/shop/' + encodeURIComponent(storeId), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } else {
+          res = await fetch('/api/shop', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        }
+
+        const data = await res.json();
+        if (!res.ok) {
+          alert('Error: ' + (data.error || 'Failed to save store item'));
+          return;
+        }
+
+        closeStoreItemModal();
+        await loadShop();
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      }
+    }
+
+    async function deleteStoreItem(storeId) {
+      const item = allShopItems.find(it => it.store_id === storeId);
+      const name = item ? item.name : '#' + storeId;
+      if (!confirm(\`Are you sure you want to remove "\${name}" from the store catalog?\`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/shop/' + encodeURIComponent(storeId), {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert('Error: ' + (data.error || 'Failed to delete store item'));
+          return;
+        }
+        await loadShop();
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      }
+    }
+
+    async function resetShopCatalog() {
+      if (!confirm('Reset the store catalog back to the official default items? Any custom store items will be restored.')) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/shop/reset', { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok) {
+          alert('Error: ' + (data.error || 'Failed to reset catalog'));
+          return;
+        }
+        alert(data.message || 'Store catalog restored successfully!');
+        await loadShop();
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      }
+    }
+
+    // --- LUCKY ROYALE & WHEEL MANAGEMENT ---
 
     async function loadWheels() {
       try {
         const res = await fetch('/api/gacha');
         const data = await res.json();
         allWheels = data.wheels || [];
+
+        renderWheelSelector();
+
         if (allWheels.length > 0) {
+          if (!allWheels.some(w => w.chest_id === currentWheelId)) {
+            currentWheelId = allWheels[0].chest_id;
+          }
           selectWheel(currentWheelId);
         }
       } catch (err) {
@@ -1366,35 +1784,54 @@ function renderDashboard() {
       }
     }
 
+    function renderWheelSelector() {
+      const container = document.getElementById('wheel-selector-buttons');
+      if (!container) return;
+
+      container.innerHTML = allWheels.map(wheel => {
+        const isSelected = wheel.chest_id === currentWheelId;
+        const icon = wheel.coin_type === 1 ? '🪙' : '💎';
+        return \`
+          <button onclick="selectWheel(\${wheel.chest_id})" id="wheel-btn-\${wheel.chest_id}" class="wheel-btn px-3 py-1.5 rounded-lg text-xs font-semibold \${isSelected ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'} transition flex items-center">
+            <span class="mr-1.5">\${icon}</span>
+            <span>\${escapeHtml(wheel.chest_name)}</span>
+          </button>
+        \`;
+      }).join('');
+    }
+
     function selectWheel(chestId) {
       currentWheelId = chestId;
       const wheel = allWheels.find(w => w.chest_id === chestId) || allWheels[0];
       if (!wheel) return;
 
-      // Update buttons
+      // Update selector buttons styling
       document.querySelectorAll('.wheel-btn').forEach(btn => {
-        btn.classList.remove('bg-amber-500', 'text-slate-950');
+        btn.classList.remove('bg-amber-500', 'text-slate-950', 'font-bold');
         btn.classList.add('bg-slate-800', 'text-slate-300');
       });
       const activeBtn = document.getElementById('wheel-btn-' + chestId);
       if (activeBtn) {
-        activeBtn.classList.add('bg-amber-500', 'text-slate-950');
+        activeBtn.classList.add('bg-amber-500', 'text-slate-950', 'font-bold');
         activeBtn.classList.remove('bg-slate-800', 'text-slate-300');
       }
 
-      // Update header
+      // Update active wheel action box
       document.getElementById('active-wheel-title').textContent = wheel.chest_name;
       const isGold = wheel.coin_type === 1;
       const badge = document.getElementById('active-wheel-badge');
       badge.textContent = isGold ? 'Gold Coins' : 'Diamonds';
       badge.className = 'px-2 py-0.5 rounded text-[11px] font-semibold ' + (isGold ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-sky-500/20 text-sky-400 border border-sky-500/30');
 
+      const idBadge = document.getElementById('active-wheel-id-badge');
+      if (idBadge) idBadge.textContent = 'Chest #' + wheel.chest_id;
+
       document.getElementById('active-wheel-grandprize').textContent = 'Grand Prize: ' + wheel.grand_prize_name + ' (Legendary Jackpot)';
       const sym = isGold ? '🪙' : '💎';
       document.getElementById('spin-1-price').textContent = '(' + wheel.once_price + ' ' + sym + ')';
       document.getElementById('spin-10-price').textContent = '(' + wheel.ten_price + ' ' + sym + ')';
 
-      // Hide results box on switch
+      // Hide results box on wheel switch
       document.getElementById('spin-results-box').classList.add('hidden');
 
       // Update reward pool
@@ -1403,7 +1840,7 @@ function renderDashboard() {
 
       poolGrid.innerHTML = wheel.reward_items.map(r => {
         const isJackpot = r.reward_level >= 3 || r.item_id === wheel.grand_prize_id;
-        const pct = ((r.weight / totalWeight) * 100).toFixed(1);
+        const pct = totalWeight > 0 ? ((r.weight / totalWeight) * 100).toFixed(1) : '0.0';
         const rarityBadge = isJackpot
           ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-slate-950">LEGENDARY ★★★</span>'
           : (r.reward_level === 2
@@ -1411,18 +1848,260 @@ function renderDashboard() {
             : '<span class="px-2 py-0.5 rounded text-[10px] text-slate-400 bg-slate-800 border border-slate-700">NORMAL ★</span>');
 
         return \`
-          <div class="bg-slate-950 border \${isJackpot ? 'border-amber-500/40 bg-amber-500/5' : 'border-slate-800'} rounded-lg p-2.5 flex items-center justify-between text-xs">
-            <div class="space-y-0.5">
-              <span class="font-medium text-slate-200 block">\${escapeHtml(r.name)}</span>
-              <span class="text-[10px] font-mono text-slate-500">Item #\${r.item_id}</span>
+          <div class="bg-slate-950 border \${isJackpot ? 'border-amber-500/40 bg-amber-500/5' : 'border-slate-800'} rounded-lg p-3 flex flex-col justify-between text-xs space-y-2 group shadow-sm">
+            <div class="flex items-start justify-between gap-2">
+              <div class="space-y-0.5">
+                <span class="font-bold text-slate-200 block group-hover:text-amber-400 transition">\${escapeHtml(r.name)}</span>
+                <span class="text-[10px] font-mono text-slate-500">Item ID: \${r.item_id}</span>
+              </div>
+              <div class="text-right space-y-1">
+                \${rarityBadge}
+                <span class="block text-[11px] font-mono text-amber-400 font-semibold">\${pct}% drop</span>
+              </div>
             </div>
-            <div class="text-right space-y-1">
-              \${rarityBadge}
-              <span class="block text-[11px] font-mono text-slate-400">\${pct}% rate</span>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-900 text-[11px] text-slate-500">
+              <span>Weight: <strong class="text-slate-300 font-mono">\${r.weight || 10}</strong></span>
+              <div class="flex items-center space-x-1.5">
+                <button onclick="openEditPrizeModal(\${r.item_id})" class="text-amber-400 hover:text-amber-300 transition text-[10px] font-medium">Edit</button>
+                <span>•</span>
+                <button onclick="deletePrize(\${r.item_id})" class="text-rose-400 hover:text-rose-300 transition text-[10px] font-medium">Remove</button>
+              </div>
             </div>
           </div>
         \`;
       }).join('');
+    }
+
+    // Wheel Modal & Actions
+    function openAddWheelModal() {
+      document.getElementById('modal-wheel-title').innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 mr-2"></span> Add Lucky Royale Wheel';
+      document.getElementById('wheel-form-id').value = '';
+      const highestId = allWheels.reduce((max, w) => Math.max(max, w.chest_id), 1005);
+      document.getElementById('wheel-input-id').value = highestId + 1;
+      document.getElementById('wheel-input-id').disabled = false;
+      document.getElementById('wheel-input-name').value = '';
+      document.getElementById('wheel-input-coin-type').value = '2';
+      document.getElementById('wheel-input-once-price').value = '60';
+      document.getElementById('wheel-input-ten-price').value = '540';
+      document.getElementById('wheel-input-gp-id').value = '203000181';
+      document.getElementById('wheel-input-gp-name').value = '';
+      document.getElementById('btn-save-wheel').textContent = 'Create Wheel';
+      document.getElementById('modal-gacha-wheel').classList.remove('hidden');
+    }
+
+    function openEditWheelModal() {
+      const wheel = allWheels.find(w => w.chest_id === currentWheelId);
+      if (!wheel) return;
+
+      document.getElementById('modal-wheel-title').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400 mr-2"></span> Edit Lucky Royale Wheel #' + wheel.chest_id;
+      document.getElementById('wheel-form-id').value = wheel.chest_id;
+      document.getElementById('wheel-input-id').value = wheel.chest_id;
+      document.getElementById('wheel-input-id').disabled = true;
+      document.getElementById('wheel-input-name').value = wheel.chest_name || '';
+      document.getElementById('wheel-input-coin-type').value = String(wheel.coin_type || 2);
+      document.getElementById('wheel-input-once-price').value = wheel.once_price || 60;
+      document.getElementById('wheel-input-ten-price').value = wheel.ten_price || 540;
+      document.getElementById('wheel-input-gp-id').value = wheel.grand_prize_id || 0;
+      document.getElementById('wheel-input-gp-name').value = wheel.grand_prize_name || '';
+      document.getElementById('btn-save-wheel').textContent = 'Update Wheel';
+      document.getElementById('modal-gacha-wheel').classList.remove('hidden');
+    }
+
+    function closeWheelModal() {
+      document.getElementById('modal-gacha-wheel').classList.add('hidden');
+    }
+
+    async function saveWheel(event) {
+      event.preventDefault();
+      const editId = document.getElementById('wheel-form-id').value;
+      const chestId = Number(document.getElementById('wheel-input-id').value);
+      const chestName = document.getElementById('wheel-input-name').value.trim();
+      const coinType = Number(document.getElementById('wheel-input-coin-type').value);
+      const oncePrice = Number(document.getElementById('wheel-input-once-price').value);
+      const tenPrice = Number(document.getElementById('wheel-input-ten-price').value);
+      const grandPrizeId = Number(document.getElementById('wheel-input-gp-id').value);
+      const grandPrizeName = document.getElementById('wheel-input-gp-name').value.trim();
+
+      const payload = {
+        chest_id: chestId,
+        chest_name: chestName,
+        coin_type: coinType,
+        once_price: oncePrice,
+        ten_price: tenPrice,
+        grand_prize_id: grandPrizeId,
+        grand_prize_name: grandPrizeName
+      };
+
+      try {
+        let res;
+        if (editId) {
+          res = await fetch('/api/gacha/' + encodeURIComponent(editId), {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } else {
+          res = await fetch('/api/gacha', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        }
+
+        const data = await res.json();
+        if (!res.ok) {
+          alert('Error: ' + (data.error || 'Failed to save wheel'));
+          return;
+        }
+
+        closeWheelModal();
+        currentWheelId = chestId;
+        await loadWheels();
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      }
+    }
+
+    async function deleteActiveWheel() {
+      const wheel = allWheels.find(w => w.chest_id === currentWheelId);
+      if (!wheel) return;
+      if (allWheels.length <= 1) {
+        alert('At least one wheel must remain in the Lucky Royale system.');
+        return;
+      }
+      if (!confirm(\`Are you sure you want to permanently delete "\${wheel.chest_name}"?\`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/gacha/' + encodeURIComponent(currentWheelId), {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert('Error: ' + (data.error || 'Failed to delete wheel'));
+          return;
+        }
+
+        const remaining = allWheels.filter(w => w.chest_id !== currentWheelId);
+        if (remaining.length > 0) currentWheelId = remaining[0].chest_id;
+        await loadWheels();
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      }
+    }
+
+    // Prize Pool Modal & Actions
+    function openAddPrizeModal() {
+      const wheel = allWheels.find(w => w.chest_id === currentWheelId);
+      if (!wheel) return;
+
+      document.getElementById('modal-prize-title').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400 mr-2"></span> Add Prize to ' + escapeHtml(wheel.chest_name);
+      document.getElementById('prize-form-chest-id').value = currentWheelId;
+      document.getElementById('prize-form-old-item-id').value = '';
+      document.getElementById('prize-input-id').value = '';
+      document.getElementById('prize-input-id').disabled = false;
+      document.getElementById('prize-input-name').value = '';
+      document.getElementById('prize-input-level').value = '1';
+      document.getElementById('prize-input-weight').value = '15';
+      document.getElementById('btn-save-prize').textContent = 'Add Prize';
+      document.getElementById('modal-gacha-prize').classList.remove('hidden');
+    }
+
+    function openEditPrizeModal(itemId) {
+      const wheel = allWheels.find(w => w.chest_id === currentWheelId);
+      if (!wheel) return;
+      const prize = wheel.reward_items.find(r => r.item_id === itemId);
+      if (!prize) return;
+
+      document.getElementById('modal-prize-title').innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400 mr-2"></span> Edit Prize: ' + escapeHtml(prize.name);
+      document.getElementById('prize-form-chest-id').value = currentWheelId;
+      document.getElementById('prize-form-old-item-id').value = prize.item_id;
+      document.getElementById('prize-input-id').value = prize.item_id;
+      document.getElementById('prize-input-id').disabled = true;
+      document.getElementById('prize-input-name').value = prize.name || '';
+      document.getElementById('prize-input-level').value = String(prize.reward_level || 1);
+      document.getElementById('prize-input-weight').value = prize.weight || 10;
+      document.getElementById('btn-save-prize').textContent = 'Update Prize';
+      document.getElementById('modal-gacha-prize').classList.remove('hidden');
+    }
+
+    function closePrizeModal() {
+      document.getElementById('modal-gacha-prize').classList.add('hidden');
+    }
+
+    async function savePrize(event) {
+      event.preventDefault();
+      const chestId = document.getElementById('prize-form-chest-id').value;
+      const oldItemId = document.getElementById('prize-form-old-item-id').value;
+      const itemId = Number(document.getElementById('prize-input-id').value);
+      const name = document.getElementById('prize-input-name').value.trim();
+      const rewardLevel = Number(document.getElementById('prize-input-level').value);
+      const weight = Number(document.getElementById('prize-input-weight').value);
+
+      const payload = {
+        item_id: itemId,
+        name,
+        reward_level: rewardLevel,
+        weight
+      };
+
+      try {
+        let res;
+        if (oldItemId) {
+          res = await fetch(\`/api/gacha/\${encodeURIComponent(chestId)}/items/\${encodeURIComponent(oldItemId)}\`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } else {
+          res = await fetch(\`/api/gacha/\${encodeURIComponent(chestId)}/items\`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        }
+
+        const data = await res.json();
+        if (!res.ok) {
+          alert('Error: ' + (data.error || 'Failed to save prize'));
+          return;
+        }
+
+        closePrizeModal();
+        await loadWheels();
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      }
+    }
+
+    async function deletePrize(itemId) {
+      const wheel = allWheels.find(w => w.chest_id === currentWheelId);
+      if (!wheel) return;
+      if (wheel.reward_items.length <= 1) {
+        alert('At least one item must remain in the prize pool.');
+        return;
+      }
+      const prize = wheel.reward_items.find(r => r.item_id === itemId);
+      const prizeName = prize ? prize.name : '#' + itemId;
+      if (!confirm(\`Are you sure you want to remove "\${prizeName}" from the prize pool?\`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(\`/api/gacha/\${encodeURIComponent(currentWheelId)}/items/\${encodeURIComponent(itemId)}\`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert('Error: ' + (data.error || 'Failed to delete prize'));
+          return;
+        }
+        await loadWheels();
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      }
     }
 
     async function spinActiveWheel(count) {
@@ -1472,7 +2151,6 @@ function renderDashboard() {
       }
     }
 
-    // ----------------------------------------------------
     // GLOBAL RANKINGS SERVICE (Bermuda & Clash Squad)
     // ----------------------------------------------------
     let currentRankingMode = 'bermuda';
