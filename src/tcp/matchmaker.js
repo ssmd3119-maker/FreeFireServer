@@ -49,7 +49,13 @@ getLocalIp().then((ip) => { if (ip) host = ip; }).catch(() => {});
 const modeKey = (m) => `${m.match_mode}:${m.game_mode}:${m.map_id}:${m.difficulty || 0}`;
 
 function staticAddr() {
-  const matchHost = (config.domains && config.domains.match) || host;
+  let fallback = host;
+  try {
+    if (config.protocol && config.protocol.serverUrl && !config.protocol.serverUrl.includes('example.com')) {
+      fallback = new URL(config.protocol.serverUrl).hostname;
+    }
+  } catch (_) {}
+  const matchHost = (config.domains && config.domains.match && !config.domains.match.includes('example.com')) ? config.domains.match : fallback;
   return `${matchHost}:${(config.protocol && config.protocol.gameServerPort) || '10100'}`;
 }
 

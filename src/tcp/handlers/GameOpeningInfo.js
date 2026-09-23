@@ -21,6 +21,7 @@ const { EProtocol, EMatchmaking } = require('../protocol');
 const OPEN_MODES = [
   {
     map_id: 1,
+    name: 'Bermuda Classic',
     game_mode: 1, // Bermuda Classic (Battle Royale)
     match_mode: 1,
     sort_id: 1,
@@ -40,6 +41,7 @@ const OPEN_MODES = [
   },
   { 
     map_id: 1, 
+    name: 'Clash Squad',
     game_mode: 15, // Clash Squad
     match_mode: 1, 
     sort_id: 2, 
@@ -60,15 +62,34 @@ const OPEN_MODES = [
 ];
 
 function handler(reqObj, ctx) {
+  const lang = reqObj.language || 'en';
   ctx.logger.info(
-    `[tcp] GameOpeningInfo region="${reqObj.region || ''}" lang="${reqObj.language || ''}" ` +
+    `[tcp] GameOpeningInfo region="${reqObj.region || ''}" lang="${lang}" ` +
     `-> ${OPEN_MODES.length} open mode(s)`
   );
   return {
     opening_info_list: { gameOpeningInfos: OPEN_MODES },
     // server timezone offset (east of UTC) in seconds; only relevant to timed
     // events, of which we advertise none.
-    timezone_offset_secs: -new Date().getTimezoneOffset() * 60
+    timezone_offset_secs: -new Date().getTimezoneOffset() * 60,
+    game_mode_name_list: {
+      game_mode_names: [
+        { mode_id: 1, language: lang, translation: 'Classic' },
+        { mode_id: 15, language: lang, translation: 'Clash Squad' }
+      ]
+    },
+    mode_level_limit_list: {
+      mode_level_limits: [
+        { map_id: 1, game_mode: 1, level: 1 },
+        { map_id: 1, game_mode: 15, level: 1 }
+      ]
+    },
+    ranking_level_limit_list: {
+      ranking_level_limits: [
+        { match_mode: 1, game_mode: 1, guest_level: 1, normal_level: 1, guest_register_need_time: 0, normal_register_need_time: 0 },
+        { match_mode: 1, game_mode: 15, guest_level: 1, normal_level: 1, guest_register_need_time: 0, normal_register_need_time: 0 }
+      ]
+    }
   };
 }
 

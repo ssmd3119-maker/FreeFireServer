@@ -36,18 +36,29 @@ async function handleGetLoginData(reqObj, ctx) {
   // Realtime endpoints the client connects to after login (LoginRes carries them).
   const p = (config.protocol) || {};
   const d = (config.domains) || {};
-  // Fallback host when no public host is configured: the detected LAN IP, else the
-  // request host, else localhost (local dev).
+  // Determine public host: prefer configured serverUrl hostname, request host header,
+  // or non-link-local LAN IP, avoiding dummy example.com placeholders.
+  let serverHost = '';
+  try {
+    if (config.protocol && config.protocol.serverUrl && !config.protocol.serverUrl.includes('example.com')) {
+      serverHost = new URL(config.protocol.serverUrl).hostname;
+    }
+  } catch (_) {}
+
+  const reqHost = ((ctx.req && ctx.req.headers && ctx.req.headers.host) || '').split(':')[0].trim();
+  const validLocalIp = localIp && !localIp.startsWith('169.254.') ? localIp : '';
   const fallbackHost =
-    localIp ||
-    ((ctx.req.headers.host || '').split(':')[0]) ||
+    serverHost ||
+    reqHost ||
+    validLocalIp ||
     '127.0.0.1';
+
   // Prefer the configured PUBLIC host so we never hand the client the container's
-  // internal IP (e.g. 10.0.0.x behind the edge):
+  // internal IP (e.g. 10.0.0.x behind the edge), as long as it's not a dummy example.com:
   //   TCP_PUBLIC_HOST   -> notification channel (the TCP gateway)
   //   MATCH_PUBLIC_HOST -> realtime UDP match server (+ its ping probe)
-  const tcpHost = d.tcp || fallbackHost;
-  const matchHost = d.match || fallbackHost;
+  const tcpHost = (d.tcp && !d.tcp.includes('example.com')) ? d.tcp : fallbackHost;
+  const matchHost = (d.match && !d.match.includes('example.com')) ? d.match : fallbackHost;
   const gameServerIp = `${matchHost}:${p.gameServerPort || '10100'}`;
   const chatAddr = `${fallbackHost}:${p.chatPort || '10200'}`;
   // TCP gateway the client opens for server push — single-sourced from ports.tcp.
