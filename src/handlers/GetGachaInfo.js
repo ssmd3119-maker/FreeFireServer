@@ -9,23 +9,24 @@
 'use strict';
 
 const { requireAccount } = require('./_shared');
+const { LUCKY_ROYALE_WHEELS } = require('../data/shopCatalog');
 
 function handleGetGachaInfo(reqObj, ctx) {
   const account = requireAccount(ctx);
   if (!account) return {};
-  const chestId = reqObj.chest_id || 1001;
+
+  const gachaInfoList = LUCKY_ROYALE_WHEELS.map((w) => ({
+    chest_id: w.chest_id,
+    lottery_count_weekly: 0,
+    next_free_time: 0,
+    not_got_num: 0,
+    limit_purchase_count_one: 999,
+    limit_purchase_count_ten: 999,
+    first_draw_reward_num: 0
+  }));
+
   return {
-    gacha_info_list: [
-      {
-        chest_id: chestId,
-        lottery_count_weekly: 0,
-        next_free_time: 0,
-        not_got_num: 0,
-        limit_purchase_count_one: 999,
-        limit_purchase_count_ten: 999,
-        first_draw_reward_num: 0
-      }
-    ]
+    gacha_info_list: gachaInfoList
   };
 }
 

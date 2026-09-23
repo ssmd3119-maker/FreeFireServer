@@ -36,6 +36,10 @@ module.exports = function createUnifiedApp() {
 
   // Admin & diagnostics API
   app.use('/api', require('../routes/index'));
+  app.get('/game-modes', (req, res, next) => {
+    req.url = '/game-modes';
+    require('../routes/index')(req, res, next);
+  });
 
   // Game protocol router (handles both auth and general game protocol endpoints)
   app.use('/', createProtocolRouter());

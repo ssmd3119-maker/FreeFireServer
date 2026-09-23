@@ -11,6 +11,7 @@
 
 const { getRepo } = require('../db/repo');
 const { requireAccount, buildAccountInfoBasic, selectedProfile } = require('./_shared');
+const rankingService = require('../services/rankingService');
 
 async function handleGetPlayerPersonalShow(reqObj, ctx) {
   const account = requireAccount(ctx);
@@ -18,10 +19,12 @@ async function handleGetPlayerPersonalShow(reqObj, ctx) {
 
   const targetId = reqObj.account_id || 0;
   const acc = targetId ? (await getRepo().getById(targetId)) || account : account;
+  const rankInfo = rankingService.getPlayerRanking(acc.uid || acc.account_id);
+  const rankingPos = rankInfo ? rankInfo.bermuda.pos : -1;
 
   const res = {
     basic_info: buildAccountInfoBasic(acc),
-    ranking_leaderboard_pos: -1,
+    ranking_leaderboard_pos: rankingPos,
     news: [],
     history_ep_info: []
   };

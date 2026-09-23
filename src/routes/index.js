@@ -225,7 +225,7 @@ router.get('/endpoints', (req, res) => {
   }
 });
 
-// 12. Active Game Modes (Bermuda Classic & Clash Squad)
+// 12. Active Game Modes (Bermuda BR, Clash Squad & Training Grounds)
 router.get('/game-modes', (req, res) => {
   res.json({
     modes: [
@@ -233,13 +233,32 @@ router.get('/game-modes', (req, res) => {
         id: 1,
         key: 'bermuda_classic',
         name: 'Bermuda Classic',
-        type: 'Battle Royale',
+        type: 'Battle Royale (Casual)',
+        game_mode: 1,
+        match_mode: 1,
         map_id: 1,
         map_name: 'Bermuda (Paradise)',
         config_id: 1001,
         max_players: 48,
         group_modes: ['Solo', 'Duo', 'Squad'],
         status: 'open',
+        tips: 'Battle Royale Classic Survival',
+        visual_map: 'https://foices.github.io/minhas_resources/bermuda.png'
+      },
+      {
+        id: 2,
+        key: 'bermuda_ranked',
+        name: 'Bermuda Ranked',
+        type: 'Battle Royale (Ranked)',
+        game_mode: 1,
+        match_mode: 2,
+        map_id: 1,
+        map_name: 'Bermuda (Paradise)',
+        config_id: 1001,
+        max_players: 48,
+        group_modes: ['Solo', 'Duo', 'Squad'],
+        status: 'open',
+        tips: 'Competitive Ranked Points',
         visual_map: 'https://foices.github.io/minhas_resources/bermuda.png'
       },
       {
@@ -247,16 +266,157 @@ router.get('/game-modes', (req, res) => {
         key: 'clash_squad',
         name: 'Clash Squad (CS)',
         type: 'Round-based 4v4',
+        game_mode: 15,
+        match_mode: 1,
         map_id: 1,
         map_name: 'Bermuda (Paradise)',
         config_id: 1015,
         max_players: 8,
         group_modes: ['Squad (4v4)'],
         status: 'open',
+        tips: 'Round-based economy combat',
         visual_map: 'https://foices.github.io/minhas_resources/contra_squad.png'
+      },
+      {
+        id: 16,
+        key: 'clash_squad_ranked',
+        name: 'Clash Squad Ranked',
+        type: 'Round-based 4v4 Ranked',
+        game_mode: 15,
+        match_mode: 6,
+        map_id: 1,
+        map_name: 'Bermuda (Paradise)',
+        config_id: 1015,
+        max_players: 8,
+        group_modes: ['Squad (4v4)'],
+        status: 'open',
+        tips: 'Ranked Stars & Competitive Ladders',
+        visual_map: 'https://foices.github.io/minhas_resources/contra_squad.png'
+      },
+      {
+        id: 23,
+        key: 'training_grounds',
+        name: 'Training Grounds',
+        type: 'Training & Target Practice',
+        game_mode: 23,
+        match_mode: 5,
+        map_id: 7,
+        map_name: 'Alpha Island (Training Ground)',
+        config_id: 7023,
+        max_players: 20,
+        group_modes: ['Solo Practice', 'Combat Zone'],
+        status: 'open',
+        tips: 'Target range, weapon testing & combat ring',
+        visual_map: 'https://foices.github.io/minhas_resources/training.png'
       }
     ]
   });
+});
+
+// 13. Shop / Store Catalog
+const { STORE_ITEMS, LUCKY_ROYALE_WHEELS } = require('../data/shopCatalog');
+
+router.get('/shop', (req, res) => {
+  const category = req.query.category;
+  let items = STORE_ITEMS;
+  if (category) {
+    items = items.filter((it) => it.type_override && it.type_override.startsWith(category));
+  }
+  res.json({
+    total: items.length,
+    items
+  });
+});
+
+// 14. Lucky Royale Wheels & Spin Simulation
+router.get('/gacha', (req, res) => {
+  res.json({
+    wheels: LUCKY_ROYALE_WHEELS
+  });
+});
+
+router.post('/gacha/spin', (req, res) => {
+  const chestId = Number(req.body.chest_id || 1001);
+  const count = Number(req.body.count || 1);
+  const wheel = LUCKY_ROYALE_WHEELS.find((w) => w.chest_id === chestId) || LUCKY_ROYALE_WHEELS[0];
+
+  const totalWeight = wheel.reward_items.reduce((acc, it) => acc + (it.weight || 10), 0);
+  const results = [];
+  let hasJackpot = false;
+
+  for (let i = 0; i < count; i += 1) {
+    let r = Math.floor(Math.random() * totalWeight);
+    let chosen = wheel.reward_items[0];
+    for (const it of wheel.reward_items) {
+      const w = it.weight || 10;
+      if (r < w) {
+        chosen = it;
+        break;
+      }
+      r -= w;
+    }
+    if (chosen.reward_level >= 3 || chosen.item_id === wheel.grand_prize_id) {
+      hasJackpot = true;
+    }
+    results.push(chosen);
+  }
+
+  res.json({
+    chest_id: wheel.chest_id,
+    chest_name: wheel.chest_name,
+    currency_name: wheel.currency_name,
+    total_cost: count > 1 ? wheel.ten_price : wheel.once_price,
+    has_jackpot: hasJackpot,
+    drops: results
+  });
+});
+
+// 15. Global Rankings Service (Bermuda & Clash Squad)
+const rankingService = require('../services/rankingService');
+
+router.get('/rankings', (req, res) => {
+  const mode = req.query.mode || 'bermuda';
+  const metric = req.query.metric || 'score';
+  const region = req.query.region || 'GLOBAL';
+  const page = Number(req.query.page || 1);
+  const limit = Number(req.query.limit || 50);
+
+  const result = rankingService.getRankings({ mode, metric, region, page, limit });
+  res.json(result);
+});
+
+router.get('/rankings/summary', (req, res) => {
+  const summary = rankingService.getSummary();
+  res.json(summary);
+});
+
+router.get('/rankings/player/:uid', (req, res) => {
+  const player = rankingService.getPlayerRanking(req.params.uid);
+  if (!player) {
+    return res.status(404).json({ error: 'Player not found in rankings' });
+  }
+  res.json(player);
+});
+
+router.post('/rankings/record-match', (req, res) => {
+  try {
+    const { uid, mode, kills, deaths, damage, win, score_delta } = req.body || {};
+    if (!uid) {
+      return res.status(400).json({ error: 'Missing required field: uid' });
+    }
+    const result = rankingService.recordMatchResult({
+      uid: Number(uid),
+      mode: mode || 'bermuda',
+      kills: Number(kills || 0),
+      deaths: Number(deaths !== undefined ? deaths : 1),
+      damage: Number(damage || 0),
+      win: Boolean(win),
+      score_delta: score_delta !== undefined && score_delta !== null ? Number(score_delta) : null
+    });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;

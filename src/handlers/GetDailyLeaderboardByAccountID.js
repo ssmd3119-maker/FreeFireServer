@@ -9,10 +9,13 @@
 'use strict';
 
 const { requireAccount } = require('./_shared');
+const rankingService = require('../services/rankingService');
 
 function handleGetDailyLeaderboardByAccountID(reqObj, ctx) {
-  if (!requireAccount(ctx)) return {};
-  return {}; // items: [], self: {}, leaderboard_size: 0
+  const account = requireAccount(ctx);
+  if (!account) return {};
+  const targetId = (reqObj && reqObj.account_id) ? Number(reqObj.account_id) : (account.uid || account.account_id || 0);
+  return rankingService.buildAccountLeaderboardRes({ main_type: 1, page_size: 50 }, targetId);
 }
 
 module.exports = {
